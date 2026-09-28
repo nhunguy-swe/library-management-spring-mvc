@@ -192,8 +192,8 @@ Khuyến khích sử dụng: Bootstrap 5, CSS Responsive, form nhập liệu tr�
 ### Cài đặt
 
 ```bash
-git clone https://github.com/nhunguy-swe/quan-ly-thu-vien.git
-cd quan-ly-thu-vien
+git clone https://github.com/nhunguy-swe/library-management-spring-mvc.git
+cd library-management-spring-mvc
 ```
 
 ### Cấu hình Database
