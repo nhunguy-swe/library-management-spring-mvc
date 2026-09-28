@@ -1,226 +1,142 @@
-# HỆ THỐNG QUẢN LÝ THƯ VIỆN SÁCH
+# BOOK LIBRARY MANAGEMENT SYSTEM
 
-## 1. Giới thiệu
+<p>
+  <img src="https://img.shields.io/badge/Java-orange" alt="Java">
+  <img src="https://img.shields.io/badge/Spring%20MVC-brightgreen" alt="Spring MVC">
+  <img src="https://img.shields.io/badge/Hibernate%2FJPA-blue" alt="Hibernate/JPA">
+  <img src="https://img.shields.io/badge/Build-Maven-red" alt="Maven">
+</p>
 
-Hệ thống Quản lý Thư viện Sách được xây dựng nhằm hỗ trợ quản lý thông tin sách, độc giả và hoạt động mượn/trả sách. Hệ thống cho phép lưu trữ dữ liệu, lập phiếu mượn, tìm kiếm sách và theo dõi tình trạng mượn trả của độc giả.
+## 1. Introduction
 
----
-
-## 2. Công nghệ sử dụng
-
-* Java
-* Spring MVC
-* Hibernate/JPA
-* MySQL hoặc SQL Server
-* JSP/Servlet
-* Bootstrap (tùy chọn)
-* Maven
+The Book Library Management System is built to support managing books, readers, and borrow/return activities. The system allows data storage, creating borrow slips, searching for books, and tracking readers' borrow/return status.
 
 ---
 
-## 3. Thiết kế cơ sở dữ liệu
+## 2. Tech Stack
 
-### Bảng SACH
-
-| Tên cột       | Kiểu dữ liệu             | Mô tả                        |
-| ------------- | ------------------------ | ---------------------------- |
-| maSach        | INT (PK, AUTO_INCREMENT) | Mã sách                      |
-| tenSach       | VARCHAR(255)             | Tên sách                     |
-| tacGia        | VARCHAR(100)             | Tác giả                      |
-| theLoai       | VARCHAR(50)              | Khoa học, Văn học, Ngoại ngữ |
-| soLuongHienCo | INT                      | Số lượng hiện có             |
+- Java
+- Spring MVC
+- Hibernate/JPA
+- MySQL or SQL Server
+- JSP/Servlet
+- Bootstrap (optional)
+- Maven
 
 ---
 
-### Bảng DOC_GIA
+## 3. Database Design
 
-| Tên cột     | Kiểu dữ liệu             | Mô tả         |
-| ----------- | ------------------------ | ------------- |
-| maDocGia    | INT (PK, AUTO_INCREMENT) | Mã độc giả    |
-| hoTen       | VARCHAR(100)             | Họ tên        |
-| loaiThe     | VARCHAR(20)              | Thường, VIP   |
-| email       | VARCHAR(100)             | Email         |
-| soDienThoai | VARCHAR(10)              | Số điện thoại |
+### BOOK Table (SACH)
+
+| Column         | Data Type                 | Description                       |
+| -------------- | -------------------------- | ---------------------------------- |
+| maSach         | INT (PK, AUTO_INCREMENT)   | Book ID                            |
+| tenSach        | VARCHAR(255)                 | Book title                         |
+| tacGia         | VARCHAR(100)                   | Author                             |
+| theLoai        | VARCHAR(50)                      | Science, Literature, Foreign Language |
+| soLuongHienCo  | INT                                 | Available quantity                 |
+
+### READER Table (DOC_GIA)
+
+| Column      | Data Type                 | Description   |
+| ----------- | -------------------------- | ------------- |
+| maDocGia    | INT (PK, AUTO_INCREMENT)   | Reader ID     |
+| hoTen       | VARCHAR(100)                 | Full name     |
+| loaiThe     | VARCHAR(20)                    | Standard, VIP |
+| email       | VARCHAR(100)                     | Email         |
+| soDienThoai | VARCHAR(10)                        | Phone number  |
+
+### BORROW SLIP Table (PHIEU_MUON)
+
+| Column    | Data Type                 | Description         |
+| --------- | -------------------------- | -------------------- |
+| maPhieu   | INT (PK, AUTO_INCREMENT)   | Slip ID              |
+| maDocGia  | INT (FK)                     | Reader               |
+| ngayMuon  | DATE                            | Borrow date          |
+| trangThai | VARCHAR(20)                        | Borrowing, Returned  |
+
+### BORROW DETAIL Table (CHI_TIET_MUON)
+
+| Column      | Data Type | Description       |
+| ----------- | --------- | ------------------ |
+| maPhieu     | INT (FK)  | Borrow slip        |
+| maSach      | INT (FK)    | Book                |
+| soLuongMuon | INT           | Quantity borrowed   |
+
+### Relationships
+
+- A Reader can have many Borrow Slips.
+- A Borrow Slip can contain many Books.
+- A Book can appear in many Borrow Slips.
+- The N-N relationship between Book and Borrow Slip is resolved via the CHI_TIET_MUON table.
 
 ---
 
-### Bảng PHIEU_MUON
+## 4. System Features
 
-| Tên cột   | Kiểu dữ liệu             | Mô tả             |
-| --------- | ------------------------ | ----------------- |
-| maPhieu   | INT (PK, AUTO_INCREMENT) | Mã phiếu mượn     |
-| maDocGia  | INT (FK)                 | Độc giả           |
-| ngayMuon  | DATE                     | Ngày mượn         |
-| trangThai | VARCHAR(20)              | Đang mượn, Đã trả |
+### 4.1 Book Management
 
----
+Add new book info: Title, Author, Genre, Available quantity.
 
-### Bảng CHI_TIET_MUON
+**Genre list:** Science, Literature, Foreign Language
 
-| Tên cột     | Kiểu dữ liệu | Mô tả         |
-| ----------- | ------------ | ------------- |
-| maPhieu     | INT (FK)     | Phiếu mượn    |
-| maSach      | INT (FK)     | Sách          |
-| soLuongMuon | INT          | Số lượng mượn |
-
-### Quan hệ
-
-* Một Độc giả có thể có nhiều Phiếu mượn.
-* Một Phiếu mượn có thể chứa nhiều Sách.
-* Một Sách có thể xuất hiện trong nhiều Phiếu mượn.
-* Quan hệ N-N giữa Sách và Phiếu mượn được giải quyết thông qua bảng CHI_TIET_MUON.
-
----
-
-## 4. Chức năng hệ thống
-
-### 4.1 Quản lý Sách
-
-Cho phép thêm mới thông tin sách:
-
-* Tên sách
-* Tác giả
-* Thể loại
-* Số lượng hiện có
-
-#### Danh sách Thể loại
-
-* Khoa học
-* Văn học
-* Ngoại ngữ
-
-#### Validation
-
-**Số lượng hiện có**
-
-* Phải là số nguyên.
-* Lớn hơn 0.
-
-Ví dụ:
+**Validation — Available quantity:** must be an integer, greater than 0.
 
 ```java
-@Min(value = 1, message = "Số lượng phải lớn hơn 0")
+@Min(value = 1, message = "Quantity must be greater than 0")
 private Integer soLuongHienCo;
 ```
 
----
+### 4.2 Reader Management
 
-### 4.2 Quản lý Độc giả
+Add new reader info: Full name, Card type, Email, Phone number.
 
-Cho phép thêm mới độc giả:
+**Card type list:** Standard, VIP
 
-* Họ tên
-* Loại thẻ
-* Email
-* Số điện thoại
-
-#### Danh sách Loại thẻ
-
-* Thường
-* VIP
-
-#### Validation
-
-**Email**
-
-* Đúng định dạng email.
-* Phải chứa ký tự @ và .
-
-Ví dụ:
+**Validation — Email:** valid email format, must contain `@` and `.`
 
 ```java
-@Email(message = "Email không hợp lệ")
+@Email(message = "Invalid email")
 private String email;
 ```
 
-**Số điện thoại**
+**Validation — Phone number:** starts with 0, exactly 10 digits.
 
-* Bắt đầu bằng số 0.
-* Đủ 10 chữ số.
-
-Regex:
-
-```java
+```
 ^0[0-9]{9}$
 ```
 
----
+### 4.3 Create Borrow Slip
 
-### 4.3 Lập Phiếu mượn
+Create a book borrow slip with: Reader (ComboBox from DB), Borrow date, Status, List of borrowed books (select book from dropdown, enter quantity).
 
-Cho phép tạo phiếu mượn sách.
-
-Thông tin gồm:
-
-* Độc giả (ComboBox từ CSDL)
-* Ngày mượn
-* Trạng thái
-* Danh sách sách mượn
-
-Chi tiết phiếu:
-
-* Chọn sách từ Dropdown
-* Nhập số lượng mượn
-
-#### Validation
-
-**Ngày mượn**
-
-* Mặc định là ngày hiện tại.
-* Không được lớn hơn ngày hiện tại.
-
-Ví dụ:
+**Validation — Borrow date:** defaults to the current date, cannot be later than today.
 
 ```java
 @PastOrPresent
 private LocalDate ngayMuon;
 ```
 
-**Số lượng mượn**
-
-* Phải lớn hơn 0.
+**Validation — Quantity borrowed:** must be greater than 0.
 
 ---
 
-## 5. Chức năng tìm kiếm
+## 5. Search Features
 
-### 5.1 Tìm kiếm Sách
+### 5.1 Search Books
 
-Cho phép tìm kiếm theo:
+Search by Title / Author. Results show: Book ID, Title, Author, Genre, Available quantity.
 
-* Tên sách
-* Tác giả
+### 5.2 Search Unreturned Borrow Slips
 
-Kết quả hiển thị:
-
-* Mã sách
-* Tên sách
-* Tác giả
-* Thể loại
-* Số lượng hiện có
+Search slips with status `Borrowing`. Results show: Reader's full name, Book title, Borrow date, Quantity borrowed.
 
 ---
 
-### 5.2 Tìm kiếm Phiếu mượn chưa trả
+## 6. Project Architecture
 
-Tìm kiếm các phiếu có trạng thái:
-
-```text
-Đang mượn
 ```
-
-Kết quả hiển thị:
-
-* Họ tên độc giả
-* Tên sách
-* Ngày mượn
-* Số lượng mượn
-
----
-
-## 6. Kiến trúc dự án
-
-```text
 src/main/java
 │
 ├── controller
@@ -247,68 +163,74 @@ src/main/java
 
 ---
 
-## 7. Yêu cầu kỹ thuật
+## 7. Technical Requirements
 
-### Framework
+**Framework:** Spring MVC, Hibernate/JPA
 
-* Spring MVC
-* Hibernate/JPA
+**MVC Pattern:** Servlet receives request → Controller handles business logic → DAO handles data access → JSP renders the UI.
 
-### Mô hình MVC
+**Database:** MySQL or SQL Server.
 
-* Servlet nhận request.
-* Controller xử lý nghiệp vụ.
-* DAO thao tác dữ liệu.
-* JSP hiển thị giao diện.
-
-### Cơ sở dữ liệu
-
-* MySQL hoặc SQL Server.
-
-### Coding Convention
-
-* Tên lớp theo PascalCase.
-* Tên biến theo camelCase.
-* Phân tách rõ Controller, Service, DAO, Entity.
-* Code dễ đọc, dễ bảo trì.
+**Coding Convention:** Class names in PascalCase, variable names in camelCase, clear separation between Controller/Service/DAO/Entity, readable and maintainable code.
 
 ---
 
-## 8. Giao diện
+## 8. UI
 
-Khuyến khích sử dụng:
-
-* Bootstrap 5
-* CSS Responsive
-* Form nhập liệu trực quan
-* Bảng dữ liệu đẹp, dễ theo dõi
-
-Điểm cộng tối đa:
-
-* 1.0 điểm
+Recommended: Bootstrap 5, responsive CSS, intuitive input forms, clean and easy-to-read data tables.
 
 ---
 
-## 9. Kết luận
+## Getting Started
 
-Hệ thống đáp ứng đầy đủ các yêu cầu:
+### Requirements
 
-✔ Quản lý Sách
+- JDK 17+
+- MySQL or SQL Server
+- IDE: IntelliJ IDEA / Eclipse / VS Code
 
-✔ Quản lý Độc giả
+### Installation
 
-✔ Lập Phiếu mượn
+```bash
+git clone https://github.com/nhunguy-swe/quan-ly-thu-vien.git
+cd quan-ly-thu-vien
+```
 
-✔ Quản lý quan hệ N-N giữa Sách và Phiếu mượn
+### Database Setup
 
-✔ Kiểm tra dữ liệu đầu vào bằng Validation
+1. Run the SQL script in the `database/` folder to create tables per the design in section 3.
+2. Update the connection info in the Hibernate/Spring config file (`application.properties` or `HibernateConfig`).
 
-✔ Tìm kiếm Sách
+> ⚠️ Don't hard-code the database password directly in your code if pushing to a public GitHub repo — use environment variables or a config file added to `.gitignore` instead.
 
-✔ Tìm kiếm Phiếu mượn chưa trả
+### Running the Application
 
-✔ Áp dụng Spring MVC và Hibernate
+```bash
+# macOS/Linux
+./mvnw spring-boot:run
 
-✔ Servlet/JSP đúng mô hình MVC
+# Windows
+mvnw.cmd spring-boot:run
+```
 
-✔ Tuân thủ Java Coding Convention
+Or deploy to Tomcat if the project uses traditional Servlet/JSP.
+
+---
+
+## 9. Conclusion
+
+The system fully meets the requirements:
+
+✔ Book Management · ✔ Reader Management · ✔ Borrow Slip Creation · ✔ N-N relationship management between Book and Borrow Slip · ✔ Input validation · ✔ Book search · ✔ Unreturned borrow slip search · ✔ Applies Spring MVC and Hibernate · ✔ Servlet/JSP follows MVC pattern correctly · ✔ Follows Java coding convention
+
+---
+
+## Author
+
+- GitHub: [@nhunguy-swe](https://github.com/nhunguy-swe)
+
+---
+
+## License
+
+Created for learning/academic purposes.
