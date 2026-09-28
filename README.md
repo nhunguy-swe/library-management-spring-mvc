@@ -192,8 +192,8 @@ Recommended: Bootstrap 5, responsive CSS, intuitive input forms, clean and easy-
 ### Installation
 
 ```bash
-git clone https://github.com/nhunguy-swe/quan-ly-thu-vien.git
-cd quan-ly-thu-vien
+git clone https://github.com/nhunguy-swe/library-management-spring-mvc.git
+cd library-management-spring-mvc
 ```
 
 ### Database Setup
